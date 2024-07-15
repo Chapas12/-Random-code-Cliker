@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Coordenadas Geográficas Aleatorias</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #222; /* Fondo gris oscuro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  .container {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative; /* Para posicionar los logros relativos a este contenedor */
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transiciones suaves */
+  }
+
+  #coordinatesDisplay {
+    display: none;
+    margin-top: 20px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  #coordinatesDisplay p {
+    margin: 10px 0;
+  }
+
+  .google-earth-button {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #3498db; /* Azul por defecto */
+    color: #555; /* Gris oscuro para el texto */
+    display: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .achievement {
+    position: absolute;
+    top: 10px;
+    left: 10px; /* Ajuste para la esquina superior izquierda */
+    padding: 10px;
+    background-color: #f1c40f; /* Amarillo por defecto */
+    color: #333; /* Texto oscuro para contraste */
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 100; /* Asegura que esté por encima de otros elementos */
+  }
+
+  .achievement-purple {
+    background-color: #9b59b6; /* Morado */
+  }
+
+  .achievement-gold {
+    background-color: #ffd700; /* Dorado */
+  }
+
+  .achievement-silver {
+    background-color: #c0c0c0; /* Plata */
+  }
+
+  .achievement-blue {
+    background-color: #3498db; /* Azul */
+  }
+
+  .achievement-red {
+    background-color: #e74c3c; /* Rojo */
+  }
+
+  .achievement-green {
+    background-color: #2ecc71; /* Verde */
+  }
+
+  .achievement-lightgray {
+    background-color: #ecf0f1; /* Gris claro */
+  }
+
+  .achievement-yellow {
+    background-color: #f1c40f; /* Amarillo */
+  }
+
+  .achievement-orange {
+    background-color: #f39c12; /* Naranja */
+  }
+
+  .achievement-pink {
+    background-color: #e91e63; /* Rosado */
+  }
+
+  #achievementMessage {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro transparente */
+    color: #fff; /* Texto blanco */
+    border-radius: 5px;
+    font-size: 14px;
+    display: none;
+    z-index: 100; /* Asegura que esté por encima de otros elementos */
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Generador de Coordenadas Geográficas Aleatorias</h1>
+  <p id="coordinatesCount">Coordenadas generadas: <span id="count">0</span></p>
+  <button id="generateButton">Generar Coordenadas</button>
+  <div id="coordinatesDisplay">
+    <p>Latitud, Longitud: [<span id="latitude"></span>, <span id="longitude"></span>]</p>
+    <button id="openGoogleEarth" class="google-earth-button">Abrir en Google Earth</button>
+  </div>
+  <div id="achievementPurple" class="achievement achievement-purple">
+    <p>QUE LOGRO MORADO 😲: <span id="purpleCount">0 veces</span></p>
+  </div>
+  <div id="achievementGold" class="achievement achievement-gold">
+    <p>DORADO 🥇 que ganador pero piensa por más: <span id="goldCount">0 veces</span></p>
+  </div>
+  <div id="achievementSilver" class="achievement achievement-silver">
+    <p>Plata 🥈 está bien pero mejor ser un ganador: <span id="silverCount">0 veces</span></p>
+  </div>
+  <div id="achievementBlue" class="achievement achievement-blue">
+    <p>¿Qué tratas de ser? 💙</p>
+  </div>
+  <div id="achievementRed" class="achievement achievement-red">
+    <p>Muy curioso ¿eh? ❤️</p>
+  </div>
+  <div id="achievementGreen" class="achievement achievement-green">
+    <p>¿En serio quieres ver qué pasa? 💚</p>
+  </div>
+  <div id="achievementLightGray" class="achievement achievement-lightgray">
+    <p>¿Qué logro es este? 🌫️</p>
+  </div>
+  <div id="achievementYellow" class="achievement achievement-yellow">
+    <p>Esto da miedo... :(</p>
+  </div>
+</div>
+
+<!-- Mensaje de logro en la esquina superior izquierda -->
+<div id="achievementMessage"></div>
+
+<script>
+  const generateButton = document.getElementById('generateButton');
+  const latitudeSpan = document.getElementById('latitude');
+  const longitudeSpan = document.getElementById('longitude');
+  const coordinatesCount = document.getElementById('count');
+  const openGoogleEarthButton = document.getElementById('openGoogleEarth');
+  const achievementPurple = document.getElementById('achievementPurple');
+  const achievementGold = document.getElementById('achievementGold');
+  const achievementSilver = document.getElementById('achievementSilver');
+  const achievementBlue = document.getElementById('achievementBlue');
+  const achievementRed = document.getElementById('achievementRed');
+  const achievementGreen = document.getElementById('achievementGreen');
+  const achievementLightGray = document.getElementById('achievementLightGray');
+  const achievementYellow = document.getElementById('achievementYellow');
+  const achievementMessage = document.getElementById('achievementMessage');
+
+  let purpleCounter = 0;
+  let goldCounter = 0;
+  let silverCounter = 0;
+  let totalCoordinates = 0;
+  let currentAchievementMessage = ''; // Variable para almacenar el último mensaje de logro mostrado
+
+  generateButton.addEventListener('click', () => {
+    // Simulando generación de coordenadas geográficas aleatorias
+    const latitude = (Math.random() * 180 - 90).toFixed(6);
+    const longitude = (Math.random() * 360 - 180).toFixed(6);
+
+    latitudeSpan.textContent = latitude;
+    longitudeSpan.textContent = longitude;
+
+    totalCoordinates++;
+    coordinatesCount.textContent = totalCoordinates;
+
+    // Mostrar las coordenadas con animación fadeIn
+    coordinatesDisplay.style.display = 'block';
+
+    // Determinar qué logros mostrar según la cantidad de coordenadas generadas
+    if (totalCoordinates >= 10 && totalCoordinates <= 50 && totalCoordinates % 10 === 0) {
+      showAchievement(achievementBlue);
+      showAchievementMessage('¿Qué tratas de ser? 💙');
+    } else if (totalCoordinates > 50 && totalCoordinates <= 500 && totalCoordinates % 100 === 0) {
+      showAchievement(achievementRed);
+      showAchievementMessage('Muy curioso ¿eh? ❤️');
+    } else if (totalCoordinates > 500 && totalCoordinates < 1000 && totalCoordinates % 200 === 0) {
+      showAchievement(achievementGreen);
+      showAchievementMessage('¿En serio quieres ver qué pasa? 💚');
+    }
+
+    // Mostrar logro especial al llegar a 1000 coordenadas generadas
+    if (totalCoordinates === 1000) {
+      showAchievement(achievementLightGray);
+      showAchievementMessage('¿Qué logro es este? 🌫️');
+    }
+
+    // Mostrar logro especial al llegar a 666 coordenadas generadas
+    if (totalCoordinates === 666) {
+      showAchievement(achievementYellow);
+      showAchievementMessage('Esto da miedo... :(');
+    }
+
+    // Seleccionar un color aleatorio para el botón de Google Earth
+    const colors = ['#3498db', '#e74c3c', '#2ecc71', '#ecf0f1', '#f1c40f', '#f39c12'];
+    const rareColors = ['#9b59b6', '#ffd700', '#c0c0c0'];
+    const allColors = [...colors, ...rareColors];
+    const randomColorIndex = Math.random();
+
+    let randomColor;
+
+    if (randomColorIndex <= 0.02) {
+      randomColor = '#9b59b6'; // Morado (2% de probabilidad)
+      purpleCounter++;
+      showAchievement(achievementPurple);
+      showAchievementMessage('¡Qué logro morado! 😲');
+    } else if (randomColorIndex <= 0.10) {
+      randomColor = '#c0c0c0'; // Plata (8% de probabilidad)
+      silverCounter++;
+      showAchievement(achievementSilver);
+      showAchievementMessage('Plata está bien pero mejor ser un ganador 🥈');
+    } else if (randomColorIndex <= 0.14) {
+      randomColor = '#ffd700'; // Dorado (4% de probabilidad)
+      goldCounter++;
+      showAchievement(achievementGold);
+      showAchievementMessage('¡Dorado, qué ganador! 🥇');
+    } else {
+      randomColor = colors[Math.floor(Math.random() * colors.length)]; // Colores más probables
+    }
+
+    openGoogleEarthButton.style.backgroundColor = randomColor;
+    openGoogleEarthButton.style.color = '#555'; // Color del texto en gris oscuro
+
+    // Reiniciar la animación después de mostrar las coordenadas
+    setTimeout(() => {
+      coordinatesDisplay.style.animation = 'none';
+      coordinatesDisplay.offsetHeight; /* Truco para forzar el reseteo de la animación */
+      coordinatesDisplay.style.animation = 'fadeIn 0.5s ease';
+    }, 50);
+
+    // Mostrar el botón de Google Earth
+    openGoogleEarthButton.style.display = 'block';
+  });
+
+  // Evento para abrir en Google Earth
+  openGoogleEarthButton.addEventListener('click', () => {
+    const latitude = latitudeSpan.textContent;
+    const longitude = longitudeSpan.textContent;
+    window.open(`https://earth.google.com/web/search/${latitude},${longitude}`);
+  });
+
+  // Función para mostrar un logro
+  function showAchievement(achievement) {
+    achievement.style.display = 'block';
+    setTimeout(() => {
+      achievement.style.display = 'none';
+    }, 3000); // Ocultar el logro después de 3 segundos
+  }
+
+  // Función para mostrar el mensaje de logro en la esquina superior izquierda
+  function showAchievementMessage(message) {
+    // Si el mensaje actual es diferente al nuevo mensaje, mostrarlo
+    if (currentAchievementMessage !== message) {
+      achievementMessage.textContent = message;
+      achievementMessage.style.display = 'block';
+      currentAchievementMessage = message;
+    }
+  }
+</script>
+</body>
+</html>
